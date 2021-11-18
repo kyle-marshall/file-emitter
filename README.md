@@ -8,7 +8,6 @@ The main output is the current bit (stays active until next clock signal).
 The side output activates when EOF is reached.
 
 ## Configuration
-`
 After placing a file emitter, you will see it's ID on it's side. You will use this ID in commands.
 
 The server commands (you have to type `server "{{command and arguments go here}}"`):
