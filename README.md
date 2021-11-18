@@ -30,9 +30,11 @@ The server commands (you have to type `server "{{command and arguments go here}}
 
 - emitterId is case insensitive in both of the above commands
 
+# issues
+- currently you have to actually remove and replace file emitter to change the file after it has been reading from another file, or it will keep reading the old file
+
 TODO:
 - Lots
 - Persisting state was giving me trouble, so I decided to avoid it altogether. Persisting file paths and offsets would make QOL better.
 - X panel input for filename
 - flags setting via command is clunky, this is just a temporary solution for resetting / changing endianness
-- currently you have to actually remove and replace file emitter to change the file after it has been read, or it will keep reading the old file
