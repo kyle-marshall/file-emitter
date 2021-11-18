@@ -1,5 +1,9 @@
 # File emitter mod
 
+# Video example
+https://www.youtube.com/watch?v=m93YOQSrMnk
+(note: the vid was before I added in endianness so it was spitting out most significant bit first, default is now least significant bit first)
+
 ## summary 
 This Logic World mod adds a file emitter component which reads the bytes of a file on your system and spits out one bit at a time as it receives clock signals (via the top input).
 
