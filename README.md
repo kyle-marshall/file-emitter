@@ -1,7 +1,7 @@
 # File emitter mod
 
 ## summary 
-This mod adds a file emitter component which reads the bytes of a file on your system and spits out one bit at a time as it receives clock signals (via the top input).
+This Logic World mod adds a file emitter component which reads the bytes of a file on your system and spits out one bit at a time as it receives clock signals (via the top input).
 
 The main output is the current bit (stays active until next clock signal).
 
