@@ -35,3 +35,4 @@ TODO:
 - Persisting state was giving me trouble, so I decided to avoid it altogether. Persisting file paths and offsets would make QOL better.
 - X panel input for filename
 - flags setting via command is clunky, this is just a temporary solution for resetting / changing endianness
+- currently you have to actually remove and replace file emitter to change the file after it has been read, or it will keep reading the old file
