@@ -1,0 +1,3 @@
+ComponentColumn.FileEmitterMod: "FileEmitterMod"
+ComponentCategory.FileEmitters: "File Emitters"
+file-emitter.FEM01: "Emits data from a file"

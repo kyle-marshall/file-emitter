@@ -1,0 +1,29 @@
+#---------------------------#
+#-FileEmitterMod-Components-#
+#---------------------------#
+
+FEM01:
+    column: "FileEmitterMod"
+    category: "FileEmitters"
+    prefab:
+        blocks:
+            -
+                scale: (2, 1, 1)
+                position: (0, 0, 0)
+                color: 88A888
+        inputs:
+            - 
+                position: (0, 1, 0)
+        outputs:
+            -
+                position: (0, 0.5, 0.5)
+                rotation: (90, 0, 0)
+                length: 0.6
+            -
+                position: (1, 0.5, 0)
+                rotation: (0, 0, 0)
+                length: 0.6
+    clientCode: FileEmitterMod.Client.FEM01
+    logicCode: FileEmitterMod.Server.FEM01
+    placingRules:
+        gridPlacingDimensions: (1, 2)
