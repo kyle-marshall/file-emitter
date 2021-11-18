@@ -100,7 +100,7 @@ namespace FileEmitterMod.Server
 			return Inputs[0].On;
 		}
 
-		private void Reset() {
+		private void Reset(string id, uint flags) {
 			_bitOffset = 0;
 			_overflow = false;
 			Outputs[0].On = false;
@@ -116,7 +116,7 @@ namespace FileEmitterMod.Server
 			var id = EmitterId;
 			uint flags = FileEmitterTracker.GetFlags(id);
 			if ((flags & FileEmitterTracker.FLAG_RESET) > 0) {
-				Reset();
+				Reset(id, flags);
 				return;
 			}
 			Outputs[0].On = GetNextBit(flags);
