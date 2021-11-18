@@ -30,7 +30,7 @@ The server commands (you have to type `server "{{command and arguments go here}}
 
 - emitterId is case insensitive in both of the above commands
 
-# issues
+# Issues
 - currently you have to actually remove and replace file emitter to change the file after it has been reading from another file, or it will keep reading the old file
 
 TODO:
