@@ -1,14 +1,9 @@
 # File emitter mod
 
-## summary 
 This Logic World mod adds a file emitter component which reads the bytes of a file on your system and spits out one bit at a time as it receives clock signals (via the top input).
 
-The main output is the current bit (stays active until next clock signal).
-
-The side output activates when EOF is reached.
-
 ## Configuration
-- Use the component edit menu ('X') to update the path name. This path should contain no special characters of course.
+- Use the component edit menu ('X') to update the file path.
 
 ## Data Sheet
 - The inputs:
@@ -19,11 +14,11 @@ The side output activates when EOF is reached.
   - The centered output on wide side is the current bit (active = 1, inactive = 0)
 
 ## Issues
-- Make sure to remove any old version of the file-emitter block from your world before you update the mod! This update has breaking changes.
+- Make sure to remove any old version of the file-emitter block from your world before you update the mod! This update has breaking changes. If you have an old version and loading the world gives an error, the v0.0.1 release has a bugfix in it which should let you load up the world to delete the old blocks.
 
 ## TODO:
 - 8 bit output variant
 
 ## Video example
-https://www.youtube.com/watch?v=m93YOQSrMnk
-(Note: The vid was before I added in endianness so it was spitting out most significant bit first, default is now least significant bit first. It's also missing the new input pins.)
+- https://www.youtube.com/watch?v=m93YOQSrMnk v0.0.1
+- https://www.youtube.com/watch?v=7Lwkupvp4N8 v0.0.2
