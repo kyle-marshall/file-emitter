@@ -70,10 +70,13 @@ namespace FileEmitterMod.Client
                     DecorationObject = gameObject
                 }
             };
+            return new Decoration[] {};
         }
 
         protected override void DataUpdate()
         {
+            if (_textMesh == null) return;
+
             var text = EmitterId ?? "???";
             if (_textMesh.text == text)
             {
