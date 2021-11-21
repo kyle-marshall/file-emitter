@@ -1,9 +1,5 @@
 # File emitter mod
 
-# Video example
-https://www.youtube.com/watch?v=m93YOQSrMnk
-(note: the vid was before I added in endianness so it was spitting out most significant bit first, default is now least significant bit first)
-
 ## summary 
 This Logic World mod adds a file emitter component which reads the bytes of a file on your system and spits out one bit at a time as it receives clock signals (via the top input).
 
@@ -12,29 +8,22 @@ The main output is the current bit (stays active until next clock signal).
 The side output activates when EOF is reached.
 
 ## Configuration
-After placing a file emitter, you will see it's ID on it's side. You will use this ID in commands.
+- Use the component edit menu ('X') to update the path name. This path should contain no special characters of course.
 
-The server commands (you have to type `server "{{command and arguments go here}}"`):
-- `fem-setpath {{emitterId}} {{/path/to/your/file}}`
+## Data Sheet
+- The inputs:
+  - CLOCK: The tall pin on top is the clock pin. Send a signal to this pin to make the file emitter emit the next bit (or reset if the RESET pin is also active.)
+  - RESET: The medium pin by CLOCK and the side with the EOF output is the reset flag. If it is active when CLOCK pin is signaled, the internal byte buffer gets wiped away and the file will be reloaded on the following CLOCK signal. You need to do this after you change the file path or to read the file again after you have reached EOF.
+  - BIG ENDIAN: The medium pin on the other side of CLOCK is a flag to control whether least significant bit is read first (default) or most significant bit first (keep this pin active for most significant first).
+- Outputs:
+  - The centered output on wide side is the current bit (active = 1, inactive = 0)
 
-  This links up the file emitter to a file on your system. This is only temporary / the state is not saved with your world.
+## Issues
+- Make sure to remove any old version of the file-emitter block from your world before you update the mod! This update has breaking changes.
 
-  E.g. `server "fem-setpath FE1 /home/bob/myfile.whatever"`
+## TODO:
+- 8 bit output variant
 
-- `fem-setflags {{emitterId}} {{flags}}`
-  Flags should be a number, which represents 0 or more flags. The individual flags are...
-  - 1: the reset flag. When this flag is set, the next clock signal will reset the read offset to 0, and the clock signal after that one will read the first bit.
-  - 2: big endian flag. When this flag is set, the most significant bit will be emitted first for each byte.
-
-  Flags are powers of two so you can combine them, for example using "3" sets both of the above flags.
-
-- emitterId is case insensitive in both of the above commands
-
-# Issues
-- currently you have to actually remove and replace file emitter to change the file after it has been reading from another file, or it will keep reading the old file
-
-TODO:
-- Lots
-- Persisting state was giving me trouble, so I decided to avoid it altogether. Persisting file paths and offsets would make QOL better.
-- X panel input for filename
-- flags setting via command is clunky, this is just a temporary solution for resetting / changing endianness
+## Video example
+https://www.youtube.com/watch?v=m93YOQSrMnk
+(Note: The vid was before I added in endianness so it was spitting out most significant bit first, default is now least significant bit first. It's also missing the new input pins.)

@@ -18,8 +18,10 @@ using UnityEngine;
 
 namespace FileEmitterMod.Client
 {
-    class FEM01 : ComponentClientCode<FEM01.IData>
+    class FEM01 : ComponentClientCode<Label.IData>
     {
+        private const string PLACEHOLDER_PATH = "/path/to/your/file.yo";
+
         private TextMeshPro _textMesh;
 
         protected static Color24 DefaultColor 
@@ -44,12 +46,6 @@ namespace FileEmitterMod.Client
                 }
                 return _id;
             }
-        }
-
-        public interface IData
-        {
-            // not actually using this currently...
-            string IdText { get; set; }
         }
 
         protected override IList<IDecoration> GenerateDecorations()
@@ -98,7 +94,14 @@ namespace FileEmitterMod.Client
 
         protected override void SetDataDefaultValues()
         {
-            Data.IdText = "FE000";
+            Data.LabelText = PLACEHOLDER_PATH;
+            Data.LabelFontSizeMax = 0.8f;
+            Data.LabelColor = DefaultColor;
+            Data.LabelMonospace = false;
+            Data.HorizontalAlignment = LabelAlignmentHorizontal.Center;
+            Data.VerticalAlignment = LabelAlignmentVertical.Middle;
+            Data.SizeX = 8;
+            Data.SizeZ = 8;
         }
     }
 }

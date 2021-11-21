@@ -9,75 +9,81 @@ namespace FileEmitterMod.Server
 {
     class FEM01 : LogicComponent
     {
-        private string _id = "";
+        private const int CUSTOM_DATA_TEXT_OFFSET = 16;
         private int _bitOffset = 0;
         private int _bitStep = 1;
         private byte[] _fileBytes = null;
-        private bool _overflow = false;
+        private bool _eof = false;
+        private bool _reset = false;
+        private bool _bigEndian = false;
 
+        // input pins
         private const int EMIT_PIN = 0;
         private const int RESET_PIN = 1;
+        private const int BIG_ENDIAN_PIN = 2;
 
+        // output pins
         private const int DATA_PIN = 0;
         private const int EOF_PIN = 1;
 
-        public string EmitterId
-        {
-            get
-            {
-                if (_id == null || _id == "")
-                {
-                    if (Address != null)
-                    {
-                        _id = string.Format("FE{0:X}", Address.ID);
-                    }
-                    else
-                    {
-                        Logger.Info("EmitterId [server]: Can't access Address right now...");
-                    }
-                }
-                return _id;
+        private string GetFilePath() {
+            byte[] customDataBytes = ComponentData?.CustomData;
+
+            if (customDataBytes == null || customDataBytes.Length <= CUSTOM_DATA_TEXT_OFFSET) {
+                Logger.Info("The text must be updated first via 'x' menu.");
+                return null;
             }
+
+            // to find CUSTOM_DATA_TEXT_OFFSET I had to print the bytes coming back and notice where IData.LabelText starts
+            // I'm getting the bytes from 16 up to the next byte which is too small to be a valid file path character
+
+            // exclusive end index
+            int sliceEndIndex = Array.FindIndex(customDataBytes, CUSTOM_DATA_TEXT_OFFSET, b => b < 32);
+            if (sliceEndIndex == -1) sliceEndIndex = customDataBytes.Length;
+            int sliceLength = sliceEndIndex - CUSTOM_DATA_TEXT_OFFSET;
+            byte[] pathBytes = (new ArraySegment<byte>(customDataBytes, CUSTOM_DATA_TEXT_OFFSET, sliceLength)).ToArray();
+
+            //Logger.Info($"GetFileBytes path bytes: {formatBytes(pathBytes)}");
+            return Encoding.UTF8.GetString(pathBytes).Trim();
         }
 
         private byte[] GetFileBytes()
         {
-            if (_fileBytes == null)
+            if (_fileBytes != null) return _fileBytes;
+
+            string filePath = GetFilePath();
+            if (filePath == null || !File.Exists(filePath))
             {
-                var id = EmitterId;
-                string filePath = FileEmitterTracker.GetFilePath(id);
-                if (filePath == null)
-                {
-                    Logger.Info($"File emitter '{id}' has no path set.");
-                    return null;
-                }
-                try
-                {
-                    _fileBytes = File.ReadAllBytes(filePath);
-                    _bitOffset = 0;
-                    _overflow = false;
-                }
-                catch (Exception)
-                {
-                    Logger.Info("Could not read file :(");
-                    return null;
-                }
+                Logger.Info($"File emitter has invalid path '{filePath}'.");
+                return null;
+            }
+            try
+            {
+                _fileBytes = File.ReadAllBytes(filePath);
+                _bitOffset = 0;
+                _eof = false;
+            }
+            catch (Exception)
+            {
+                Logger.Info("Could not read file :(");
+                return null;
             }
             return _fileBytes;
         }
 
         private string formatBytes(byte[] bytes)
         {
+            if (bytes == null) return "<null>";
             var s = "";
             foreach (var b in bytes)
             {
-                s += "|" + b.ToString();
+                s += "|" + b.ToString("X2");
             }
             s += "|";
             return s;
         }
 
-        private bool GetNextBit(uint flags)
+        private bool GetNextBit()
         {
             var bytes = GetFileBytes();
             if (bytes == null)
@@ -88,21 +94,19 @@ namespace FileEmitterMod.Server
             if (byteOffset >= bytes.Length)
             {
                 // EOF
-                _overflow = true;
+                _eof = true;
                 return false;
             }
 
-            bool bigEndian = (flags & FileEmitterTracker.FLAG_BIG_ENDIAN) > 0;
-
 			// leaving spam enabled for now for sanity checks
-            Logger.Info($"GetNextBit bytes: {formatBytes(bytes)}");
-            Logger.Info($"GetNextBit offsets (bit, byte): {_bitOffset}, {byteOffset}");
-            Logger.Info($"GetNextBit bigEndian: {bigEndian}");
+            //Logger.Info($"GetNextBit bytes: {formatBytes(bytes)}");
+            //Logger.Info($"GetNextBit offsets (bit, byte): {_bitOffset}, {byteOffset}");
+            //Logger.Info($"GetNextBit bigEndian: {bigEndian}");
 
             byte theByte = bytes[byteOffset];
             int rem = _bitOffset % 8;
 
-            byte mask = (byte)(1 << (bigEndian ? 7 - rem : rem));
+            byte mask = (byte)(1 << (_bigEndian ? 7 - rem : rem));
             bool pos = (theByte & mask) != 0;
             _bitOffset += _bitStep;
             return pos;
@@ -113,13 +117,18 @@ namespace FileEmitterMod.Server
             return Inputs[0].On;
         }
 
-        private void Reset(string id, uint flags)
+        private void Reset()
         {
             _bitOffset = 0;
-            _overflow = false;
-            Outputs[0].On = false;
-            Outputs[1].On = false;
-            FileEmitterTracker.SetFlags(id, flags & (~FileEmitterTracker.FLAG_RESET));
+            _eof = false;
+            _fileBytes = null;
+            Outputs[DATA_PIN].On = false;
+            Outputs[EOF_PIN].On = false;
+        }
+
+        protected void ReadFlags() {
+            _reset = Inputs[RESET_PIN].On;
+            _bigEndian = Inputs[BIG_ENDIAN_PIN].On;
         }
 
         protected override void DoLogicUpdate()
@@ -128,15 +137,14 @@ namespace FileEmitterMod.Server
             {
                 return;
             }
-            var id = EmitterId;
-            uint flags = FileEmitterTracker.GetFlags(id);
-            if ((flags & FileEmitterTracker.FLAG_RESET) > 0)
+            ReadFlags();
+            if (_reset)
             {
-                Reset(id, flags);
+                Reset();
                 return;
             }
-            Outputs[0].On = GetNextBit(flags);
-            Outputs[1].On = _overflow;
+            Outputs[DATA_PIN].On = GetNextBit();
+            Outputs[EOF_PIN].On = _eof;
         }
     }
 }
