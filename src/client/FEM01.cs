@@ -59,9 +59,7 @@ namespace FileEmitterMod.Client
                         .ComponentDecorations
                         .LabelText);
             this._textMesh = gameObject.GetComponent<TextMeshPro>();
-            return (IList<IDecoration>)
-            new Decoration[1]
-            {
+            return (IList<IDecoration>) new Decoration[]{
                 new Decoration()
                 {
                     //                                        THE BOOTY
@@ -70,7 +68,6 @@ namespace FileEmitterMod.Client
                     DecorationObject = gameObject
                 }
             };
-            return new Decoration[] {};
         }
 
         protected override void DataUpdate()
